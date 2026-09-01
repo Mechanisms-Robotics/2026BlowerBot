@@ -5,41 +5,56 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static frc.robot.CONSTANTS.*;
-import static frc.robot.CONSTANTS.DriveConstants;
 
-import choreo.Choreo;
-import choreo.trajectory.SwerveSample;
-import choreo.trajectory.Trajectory;
+import java.util.HashMap;
+import java.util.function.Supplier;
+
+import frc.robot.CONSTANTS.DriveConstants;
+import frc.robot.CONSTANTS.VisionConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.DrivetrainController;
 import frc.robot.subsystems.drivetrain.GyroIO;
 import frc.robot.subsystems.drivetrain.GyroIORedux;
 import frc.robot.subsystems.drivetrain.ModuleIOSim;
 import frc.robot.subsystems.drivetrain.ModuleIOTalonFXRedux;
-import java.util.Optional;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.PoseCameraIOPhoton;
+import frc.robot.subsystems.vision.PoseCameraIOSim;
 
 public class RobotContainer {
+    public final Drivetrain drivetrain;
 
-    private final Drivetrain drivetrain;
+    @SuppressWarnings("unused")
+    private final Vision vision;
     private final DrivetrainController drivetrainController;
+    
+    public final SendableChooser<String> autoChooser = new SendableChooser<>();
 
     private final CommandPS4Controller controller = new CommandPS4Controller(
-        CONTROLLER_PORT
+        CONSTANTS.CONTROLLER_PORT
     );
+    
+    private final HashMap<String, Supplier<Command>> autos = new HashMap<>();
 
     public RobotContainer() {
-        // TODO: Think about where to initialize all of this properly
         if (CONSTANTS.CURRENT_MODE == CONSTANTS.SIM_MODE) {
             this.drivetrain = new Drivetrain(
                 new GyroIO() {},
@@ -48,6 +63,14 @@ public class RobotContainer {
                 new ModuleIOSim(DriveConstants.BACK_LEFT),
                 new ModuleIOSim(DriveConstants.BACK_RIGHT)
             );
+
+            this.vision = new Vision(
+                this.drivetrain.poseEstimator,
+                new PoseCameraIOSim(
+                    "Photon_Camera_Sim1", 
+                    Transform3d.kZero, 
+                    drivetrain.poseEstimator
+                ));
         } else {
             this.drivetrain = new Drivetrain(
                 new GyroIORedux(),
@@ -55,22 +78,31 @@ public class RobotContainer {
                 new ModuleIOTalonFXRedux(DriveConstants.FRONT_RIGHT),
                 new ModuleIOTalonFXRedux(DriveConstants.BACK_LEFT),
                 new ModuleIOTalonFXRedux(DriveConstants.BACK_RIGHT)
+        
+            );
+           
+            this.vision = new Vision(
+                this.drivetrain.poseEstimator,
+                new PoseCameraIOPhoton(VisionConstants.CAMERA1_NAME, VisionConstants.CAMERA1_TRANSFORM3D),
+                new PoseCameraIOPhoton(VisionConstants.CAMERA2_NAME, VisionConstants.CAMERA2_TRANSFORM3D)
             );
         }
+
         this.drivetrainController = new DrivetrainController(this.drivetrain);
+
         configureBindings();
-        generateAutos();
+        SmartDashboard.putData("CommandScheduler", CommandScheduler.getInstance());
     }
 
     private void configureBindings() {
-        controller
+        this.controller
             .cross()
             .onTrue(
                 new InstantCommand(() -> {
-                    this.drivetrain.zeroGyro();
+                    this.drivetrain.resetHeading();
                 })
             );
-
+        
         this.drivetrain.setDefaultCommand(
             new RunCommand(
                 () -> {
@@ -80,12 +112,8 @@ public class RobotContainer {
                         forward,
                         strafe
                     );
-                    double rotation;
-                    if (CONSTANTS.CURRENT_MODE == CONSTANTS.Mode.SIM) {
-                        rotation = -this.controller.getRawAxis(3); // Why is sim different then driverstation?
-                    } else {
-                        rotation = -this.controller.getRightX();
-                    }
+                    
+                    double rotation = -this.controller.getRightX();
 
                     // apply deadbands and scaling
                     rotation = MathUtil.applyDeadband(
@@ -123,20 +151,25 @@ public class RobotContainer {
         );
     }
 
-    private Command testAuto = null;
+    private void publishAutoNames() {
+        // add commands to the autos hashmap here
+        autos.put("None", () -> Commands.none());
+        
 
-    private void generateAutos() {
-        Optional<Trajectory<SwerveSample>> trajectory = Choreo.loadTrajectory(
-            "Test Path"
-        );
-        this.testAuto = new FollowPath(trajectory.get(), this.drivetrain, true);
+        for (String name : autos.keySet()) {
+            autoChooser.addOption(name, name);
+        }
 
-        System.out.println("*** Loaded Test Path autonomous ***");
+        autoChooser.setDefaultOption("None", "None");
+        
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
-    public Command getAutonomousCommand() {
-        return testAuto;
-        //return Commands.print("No autonomous command configured");
+    public Command getAutonomousCommand(String name) {
+        Command autoCommand = this.autos.getOrDefault(name, () -> Commands.none()).get();
+
+        autoCommand.setName(name);
+        return autoCommand;
     }
 
     private static Translation2d getDriveVelocity(double x, double y) {

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drivetrain;
 
+import static edu.wpi.first.units.Units.Fahrenheit;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -12,7 +13,6 @@ import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -196,7 +196,7 @@ public class ModuleIOTalonFXRedux implements ModuleIO {
             );
         this.driveVelocity = this.driveTalon.getVelocity();
         this.driveAppliedVolts = this.driveTalon.getMotorVoltage();
-        this.driveCurrent = this.driveTalon.getStatorCurrent();
+        this.driveCurrent = this.driveTalon.getSupplyCurrent();
 
         // Create turn status signals
         this.turnAbsolutePosition = this.cancoder.getAbsPositionFrame();
@@ -207,7 +207,7 @@ public class ModuleIOTalonFXRedux implements ModuleIO {
             );
         this.turnVelocity = this.turnTalon.getVelocity();
         this.turnAppliedVolts = this.turnTalon.getMotorVoltage();
-        this.turnCurrent = this.turnTalon.getStatorCurrent();
+        this.turnCurrent = this.turnTalon.getSupplyCurrent();
 
         // Configure periodic frames
         BaseStatusSignal.setUpdateFrequencyForAll(
@@ -258,10 +258,10 @@ public class ModuleIOTalonFXRedux implements ModuleIO {
             this.turnAppliedVolts,
             this.turnCurrent
         );
-        var turnEncoderStatus = Frame.waitForFrames(
-            Timeouts.STD_TIMEOUT,
-            this.turnAbsolutePosition
-        );
+        // var turnEncoderStatus = Frame.waitForFrames(
+        //     Timeouts.STD_TIMEOUT,
+        //     this.turnAbsolutePosition
+        // );
 
         // Update drive inputs
         inputs.driveConnected = this.driveConnectedDebounce.calculate(
@@ -275,6 +275,7 @@ public class ModuleIOTalonFXRedux implements ModuleIO {
         );
         inputs.driveAppliedVolts = this.driveAppliedVolts.getValueAsDouble();
         inputs.driveCurrentAmps = this.driveCurrent.getValueAsDouble();
+        inputs.driveTempFahrenheit = this.driveTalon.getDeviceTemp().getValue().in(Fahrenheit);
 
         // Update turn inputs
         inputs.turnConnected = this.turnConnectedDebounce.calculate(
@@ -282,7 +283,8 @@ public class ModuleIOTalonFXRedux implements ModuleIO {
         );
         inputs.turnEncoderConnected =
             this.turnEncoderConnectedDebounce.calculate(
-                turnEncoderStatus != null
+                true
+                //turnEncoderStatus != null
             );
         inputs.turnAbsolutePosition = Rotation2d.fromRotations(
             this.cancoder.getAbsPosition()
@@ -295,6 +297,7 @@ public class ModuleIOTalonFXRedux implements ModuleIO {
         );
         inputs.turnAppliedVolts = this.turnAppliedVolts.getValueAsDouble();
         inputs.turnCurrentAmps = this.turnCurrent.getValueAsDouble();
+        inputs.turnTempFahrenheit = this.turnTalon.getDeviceTemp().getValue().in(Fahrenheit);
 
         // Update odometry inputs
         inputs.odometryTimestamps = this.timestampQueue.stream()

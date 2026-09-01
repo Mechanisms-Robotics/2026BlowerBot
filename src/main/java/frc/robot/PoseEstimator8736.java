@@ -1,5 +1,7 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.AutoLogOutput;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -19,6 +21,8 @@ public class PoseEstimator8736 {
     private final SwerveDriveKinematics kinematics;
     private final SwerveDrivePoseEstimator poseEstimator;
 
+    private final SwerveDrivePoseEstimator simulatedPoseEstimator; // only use in simulation
+
     private Rotation2d rawGyroRotation = Rotation2d.kZero;
     private SwerveModulePosition[] lastModulePositions = // For delta tracking
         new SwerveModulePosition[] {
@@ -27,6 +31,8 @@ public class PoseEstimator8736 {
             new SwerveModulePosition(),
             new SwerveModulePosition(),
         };
+
+    private boolean visionEnabled = true; // default to true because we're goated cuh
 
     /**
      * Creates a new PoseEstimator.
@@ -43,6 +49,13 @@ public class PoseEstimator8736 {
         this.kinematics = kinematics;
         this.rawGyroRotation = initialGyroRotation;
         this.poseEstimator = new SwerveDrivePoseEstimator(
+            kinematics,
+            rawGyroRotation,
+            lastModulePositions,
+            initialPose
+        );
+
+        this.simulatedPoseEstimator = new SwerveDrivePoseEstimator(
             kinematics,
             rawGyroRotation,
             lastModulePositions,
@@ -91,6 +104,12 @@ public class PoseEstimator8736 {
             rawGyroRotation,
             modulePositions
         );
+
+        this.simulatedPoseEstimator.updateWithTime(
+            timestamp,
+            rawGyroRotation,
+            modulePositions
+        );
     }
 
     /**
@@ -105,11 +124,19 @@ public class PoseEstimator8736 {
         double timestampSeconds,
         Matrix<N3, N1> visionMeasurementStdDevs
     ) {
+        if (!visionEnabled) {
+            return; // ignore vision measurements if vision is disabled
+        }
+
         poseEstimator.addVisionMeasurement(
             visionRobotPoseMeters,
             timestampSeconds,
             visionMeasurementStdDevs
         );
+    }
+
+    public void setVisionEnabled(boolean enabled) {
+        this.visionEnabled = enabled;
     }
 
     /**
@@ -122,6 +149,10 @@ public class PoseEstimator8736 {
         Pose2d visionRobotPoseMeters,
         double timestampSeconds
     ) {
+        if (!visionEnabled) {
+            return; // ignore vision measurements if vision is disabled
+        }
+
         poseEstimator.addVisionMeasurement(
             visionRobotPoseMeters,
             timestampSeconds
@@ -143,8 +174,20 @@ public class PoseEstimator8736 {
      *
      * @return The current pose estimate
      */
+    @AutoLogOutput(key = "PoseEstimator8736/EstimatedPosition")
     public Pose2d getEstimatedPose() {
         return poseEstimator.getEstimatedPosition();
+    }
+
+    /**
+     * Only use this in simulation to get the actual simulated position of the robot.
+     * This position is determined by odometry.
+     * 
+     * @return actual simulated position
+     */
+    @AutoLogOutput(key = "Simulation/ActualPosition")
+    public Pose2d getSimulatedPose() {
+        return this.simulatedPoseEstimator.getEstimatedPosition();
     }
 
     /**

@@ -1,15 +1,16 @@
 /******************************************************************************
+ *         
+ *                 ** REBUILT **
+ *                                                                    *
+ *  THIS FILE IS FOR MANAGING THE CONSTANTS FOR THE REBUILT COMPETITION BOT.          *
  *                                                                            *
- *                 ** MECHIATTO **                                            *
- *                                                                            *
- *  THIS FILE IS FOR MANAGING THE CONSTANTS FOR THE MECHIATTO PRACTICE BOT.   *
- *                                                                            *
- *  DO NOT USE THIS FILE FOR THE COMPETITION BOT.                             *
+ *  DO NOT USE THIS FILE FOR THE MECHIATTO PRACTICE BOT.                      *
  *                                                                            *
  *  MAKE SURE TO UPDATE CONSTANTS HERE ONLY IF THEY ARE SPECIFIC TO THE       *
- *  MECHIATTO PRACTICE BOT.                                                   *
+ *  COMPETITION BOT.                                                          *
  *                                                                            *
  ******************************************************************************/
+
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Amps;
@@ -23,8 +24,12 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -32,9 +37,19 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
@@ -48,17 +63,53 @@ public class CONSTANTS {
     //RobotContainer
     public static final int CONTROLLER_PORT = 0;
 
-    // Vision Constants
-    public static AprilTagFieldLayout APRILTAG_FIELD_LAYOUT =
-        AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+    // MARK: Field
+    public static class FieldConstants {
+        public static final AprilTagFieldLayout APRILTAG_FIELD_LAYOUT =
+            AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
-    //Localization
+        public static double WIDTH = APRILTAG_FIELD_LAYOUT.getFieldWidth();
+        public static double LENGTH = APRILTAG_FIELD_LAYOUT.getFieldLength();
+        public static Pose2d CENTER = new Pose2d(LENGTH/2.0, WIDTH/2.0, Rotation2d.kZero);
+    }
+
+    // MARK: Vision
+    public static class VisionConstants {
+        public static final String CAMERA1_NAME = "PhotonCameraLeft";
+        public static final double LENGTH_METERS = 0.7;
+        public static final double WIDTH_METERS = 0.695;
+    
+        public static final Transform3d CAMERA1_TRANSFORM3D = new Transform3d(
+            -LENGTH_METERS / 2.0 + Units.inchesToMeters(10.0), // forward distances from the center of the robot
+            WIDTH_METERS / 2.0, // leftward distance from the center of the robot
+            Units.inchesToMeters(18.5), //tuned
+            new Rotation3d(
+                0, 
+                0, 
+                Math.toRadians(90)    // camera is mounted sideways
+            )
+        );
+    
+        public static final String CAMERA2_NAME = "PhotonCameraRight";
+        public static final Transform3d CAMERA2_TRANSFORM3D = new Transform3d(
+            -LENGTH_METERS / 2.0 + Units.inchesToMeters(9.5),
+            -WIDTH_METERS / 2.0, 
+            Units.inchesToMeters(18.5), 
+            new Rotation3d(
+                0,
+                0,
+                Math.toRadians(-90)
+            )
+        );
+
+        public static final double Z_THRESHOLD = 0.5;
+    }
     public static final int GYRO_CAN_ID = 9;
 
     // Path Following Constants
-    public static final double PATH_FOLLOWER_P_X = 2.0;
-    public static final double PATH_FOLLOWER_P_Y = 2.0;
-    public static final double PATH_FOLLOWER_P_THETA = 4.0;
+    public static final double PATH_FOLLOWER_P_X = 10.0;
+    public static final double PATH_FOLLOWER_P_Y = PATH_FOLLOWER_P_X;
+    public static final double PATH_FOLLOWER_P_THETA = 8.0;
 
     public static final double ROBOT_LOOP_PERIOD = 0.02;
     public static final Mode SIM_MODE = Mode.SIM;
@@ -77,7 +128,7 @@ public class CONSTANTS {
         REPLAY,
     }
 
-    // NEW DRIVETRAIN CONSTANTS
+    // MARK: Drivetrain
     public static class DriveConstants {
 
         // Both sets of gains need to be tuned to your individual robot.
@@ -85,7 +136,7 @@ public class CONSTANTS {
         // The steer motor uses any SwerveModule.SteerRequestType control request with the
         // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
         private static final Slot0Configs STEER_GAINS = new Slot0Configs()
-            .withKP(25.0)
+            .withKP(60.0)
             .withKI(0)
             .withKD(0)
             .withKS(0)
@@ -97,11 +148,11 @@ public class CONSTANTS {
         // When using closed-loop control, the drive motor uses the control
         // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
         private static final Slot0Configs DRIVE_GAINS = new Slot0Configs()
-            .withKP(0.1)
+            .withKP(1.6)
             .withKI(0)
             .withKD(0)
-            .withKS(0)
-            .withKV(0);
+            .withKS(0.129)
+            .withKV(0.753);
 
         // The closed-loop output type to use for the steer motors;
         // This affects the PID/FF gains for the steer motors
@@ -126,12 +177,17 @@ public class CONSTANTS {
 
         // The stator current at which the wheels start to slip;
         // This needs to be tuned to your individual robot
-        private static final Current SLIP_CURRENT = Amps.of(120.0);
+        private static final Current SLIP_CURRENT = Amps.of(90.0);
 
         // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
         // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
         private static final TalonFXConfiguration DRIVE_INITIAL_CONFIGS =
-            new TalonFXConfiguration();
+            new TalonFXConfiguration().withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withSupplyCurrentLimit(Amps.of(70))
+                    .withSupplyCurrentLimitEnable(true)
+                    
+            );
         private static final TalonFXConfiguration STEER_INITIAL_CONFIGS =
             new TalonFXConfiguration().withCurrentLimits(
                 new CurrentLimitsConfigs()
@@ -155,11 +211,12 @@ public class CONSTANTS {
 
         // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
         // This may need to be tuned to your individual robot
+        @SuppressWarnings("unused")
         private static final double COUPLE_RATIO = 0.0;
 
-        private static final double DRIVE_GEAR_RATIO = 7.363636363636365;
+        private static final double DRIVE_GEAR_RATIO = 6.75;
         private static final double STEER_GEAR_RATIO = 150.0 / 7.0; // ~21.43
-        public static final Distance WHEEL_RADIUS = Inches.of(2.0);
+        public static final Distance WHEEL_RADIUS = Inches.of(2.23);
 
         private static final boolean INVERT_LEFT_SIDE = false;
         private static final boolean INVERT_RIGHT_SIDE = true;
@@ -206,6 +263,9 @@ public class CONSTANTS {
             .withSteerFrictionVoltage(STEER_FRICTION_VOLTAGE)
             .withDriveFrictionVoltage(DRIVE_FRICTION_VOLTAGE);
 
+        private static final double TRACK_WIDTH_METERS = 0.55;
+        private static final double TRACK_LENGTH_METERS = 0.55;
+    
         // Front Left
         private static final int FRONT_LEFT_DRIVE_MOTOR_ID = 1;
         private static final int FRONT_LEFT_STEER_MOTOR_ID = 5;
@@ -216,8 +276,8 @@ public class CONSTANTS {
         private static final boolean FRONT_LEFT_STEER_MOTOR_INVERTED = true;
         private static final boolean FRONT_LEFT_ENCODER_INVERTED = true;
 
-        private static final Distance FRONT_LEFT_X_POS = Meters.of(0.33);
-        private static final Distance FRONT_LEFT_Y_POS = Meters.of(0.23);
+        private static final Distance FRONT_LEFT_X_POS = Meters.of(TRACK_LENGTH_METERS / 2);
+        private static final Distance FRONT_LEFT_Y_POS = Meters.of(TRACK_WIDTH_METERS / 2);
 
         // Front Right
         private static final int FRONT_RIGHT_DRIVE_MOTOR_ID = 2;
@@ -229,12 +289,12 @@ public class CONSTANTS {
         private static final boolean FRONT_RIGHT_STEER_MOTOR_INVERTED = true;
         private static final boolean FRONT_RIGHT_ENCODER_INVERTED = true;
 
-        private static final Distance FRONT_RIGHT_X_POS = Meters.of(0.33);
-        private static final Distance FRONT_RIGHT_Y_POS = Meters.of(-0.23);
+        private static final Distance FRONT_RIGHT_X_POS = Meters.of(TRACK_LENGTH_METERS / 2);
+        private static final Distance FRONT_RIGHT_Y_POS = Meters.of(-TRACK_WIDTH_METERS / 2);
 
         // Back Left
-        private static final int BACK_LEFT_DRIVE_MOTOR_ID = 8;
-        private static final int BACK_LEFT_STEER_MOTOR_ID = 4;
+        private static final int BACK_LEFT_DRIVE_MOTOR_ID = 4; // this is swapped with steer on Mechiatto for some reason
+        private static final int BACK_LEFT_STEER_MOTOR_ID = 8;
         private static final int BACK_LEFT_ENCODER_ID = 4;
         private static final Angle BACK_LEFT_ENCODER_OFFSET = Rotations.of(
             0
@@ -242,12 +302,12 @@ public class CONSTANTS {
         private static final boolean BACK_LELFT_STEER_MOTOR_INVERTED = true;
         private static final boolean BACK_LEFT_ENCODER_INVERTED = true;
 
-        private static final Distance BACK_LEFT_X_POS = Meters.of(-0.33);
-        private static final Distance BACK_LEFT_Y_POS = Meters.of(0.23);
+        private static final Distance BACK_LEFT_X_POS = Meters.of(-TRACK_LENGTH_METERS / 2);
+        private static final Distance BACK_LEFT_Y_POS = Meters.of(TRACK_WIDTH_METERS / 2);
 
         // Back Right
-        private static final int BACK_RIGHT_DRIVE_MOTOR_ID = 7;
-        private static final int BACK_RIGHT_STEER_MOTOR_ID = 3;
+        private static final int BACK_RIGHT_DRIVE_MOTOR_ID = 3; // this is swapped with steer on Mechiatto for some reason
+        private static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
         private static final int BACK_RIGHT_ENCODER_ID = 3;
         private static final Angle BACK_RIGHT_ENOCDER_OFFSET = Rotations.of(
             0
@@ -255,8 +315,8 @@ public class CONSTANTS {
         private static final boolean BACK_RIGHT_STEER_MOTOR_INVERTED = true;
         private static final boolean BACK_RIGHT_ENCODER_INVERTED = true;
 
-        private static final Distance BACK_RIGHT_X_POS = Meters.of(-0.33);
-        private static final Distance BACK_RIGHT_Y_POS = Meters.of(-0.23);
+        private static final Distance BACK_RIGHT_X_POS = Meters.of(-TRACK_LENGTH_METERS / 2);
+        private static final Distance BACK_RIGHT_Y_POS = Meters.of(-TRACK_WIDTH_METERS / 2);
 
         public static final SwerveModuleConstants<
             TalonFXConfiguration,

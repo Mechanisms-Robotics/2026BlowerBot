@@ -1,6 +1,6 @@
 package frc.robot.subsystems.blowers;
 
-public class BlowersIOM12 implements BlowersIO {
+public class BlowersIOSparkMax implements BlowersIO {
 
     @Override
     public void updateInputs(BlowersIOInputs inputs) {

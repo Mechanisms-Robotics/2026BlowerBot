@@ -8,6 +8,16 @@ FRC Team 8736 (The Mechanisms) 2026 robot code. Java 17, WPILib GradleRIO 2026, 
 
 **Required:** Before committing, check whether your change affects anything described in `STUDENTS.md`, the student guide to this codebase. That includes subsystems, commands, hardware, IO interfaces, the control flow, constants, auto routines, build/sim steps, and the "Starter challenges" (e.g. a bug listed there that you just fixed). If it does, update `STUDENTS.md` in the same commit, keeping its high-school-level tone. If nothing in it is affected, leave it alone.
 
+## Unit tests for new code
+
+**Required:** When you add or change logic, add JUnit 5 tests in `src/test/java` (mirroring the `frc.robot` package layout) that would catch a regression in that logic. Run `./gradlew test` before committing; all tests must pass. CI (`.github/workflows/build-and-test.yml`) runs `./gradlew build` on every PR into `main`/`develop`, and it is a required check.
+
+Only write tests that earn their place:
+- **Do test** things with real logic where a mistake is plausible and costly: math and conversions (kinematics, unit conversions, coordinate/alliance flipping), state decisions (filters, thresholds, mode selection), command behavior (start/end conditions, what a command asks a subsystem to do), and constants invariants (e.g. no duplicate CAN IDs).
+- **Test through the IO interfaces.** Swap in a fake `XxxIO` (see `src/test/java/.../drivetrain/FakeModuleIO.java`) instead of real hardware, and assert on what the subsystem told the IO to do or how it handled given inputs. Use `DriverStationSim` for alliance and `SimHooks.pauseTiming()`/`stepTiming()` for time-dependent commands (see `FollowPathTest`).
+- **Don't test** getters/setters, simple pass-throughs, WPILib/vendor library behavior, or trivial code. Don't write tests that just restate the implementation, need real hardware, or depend on timing. Skip the test when it wouldn't catch a realistic bug, and say so in your summary rather than adding filler.
+- Keep tests deterministic and fast. If a test touches WPILib HAL-backed classes (`DriverStation`, sim classes, etc.), call `HAL.initialize(500, 0)` in setup.
+
 ## Commands
 
 Use the Gradle wrapper from the repo root (WPILib VS Code "Build Robot Code" / "Simulate Robot Code" run the same tasks):
@@ -16,7 +26,7 @@ Use the Gradle wrapper from the repo root (WPILib VS Code "Build Robot Code" / "
 ./gradlew build            # compile + run tests
 ./gradlew simulateJava     # run desktop simulation (sim GUI + driver station enabled by default)
 ./gradlew deploy           # deploy to the roboRIO (team number from .wpilib/wpilib_preferences.json)
-./gradlew test             # JUnit 5 tests (src/test/java — none exist yet)
+./gradlew test             # JUnit 5 tests in src/test/java
 ./gradlew test --tests 'frc.robot.SomeTest'   # single test class
 ./gradlew replayWatch      # AdvantageKit replay watcher
 ```

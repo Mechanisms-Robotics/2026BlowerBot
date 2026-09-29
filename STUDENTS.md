@@ -198,7 +198,21 @@ The robot runs in one of three **modes** (`CONSTANTS.Mode`):
 
 ---
 
-## 9. Try It Yourself
+## 9. Unit Tests: Robot Code That Checks Itself
+
+A **unit test** is a small program that runs one piece of our code and checks that the answer is right. For example: "if the joystick is pushed all the way diagonally, the robot should drive at full speed, not *faster* than full speed." The tests live in `src/test/java/`, in folders that mirror the real code in `src/main/java/`.
+
+Why bother? Robot code breaks in sneaky ways. Change one number or flip one sign, and the robot might drive backwards on the red alliance while working perfectly on blue. Tests catch that on your laptop in seconds, instead of on the field in front of a crowd.
+
+**The IO pattern makes this possible.** Remember the video game controller analogy from section 7? In tests we plug in a *fake* module (`FakeModuleIO`) that doesn't touch any motors. It just writes down what it was told to do. The test then checks those notes: "Did the front-left wheel get told to point at 135°?"
+
+**Tests run automatically on every pull request.** GitHub runs all of them (this is called **CI**, continuous integration), and a PR can't be merged into `develop` or `main` until they pass. If your PR shows a red ❌, click **Details** to see which test failed and why.
+
+**Good tests check things that could realistically go wrong:** math, unit conversions, red/blue alliance flipping, and whether a command starts and stops when it should. We don't write tests for trivial code just to have more tests.
+
+---
+
+## 10. Try It Yourself
 
 You'll need the **WPILib VS Code** installation (from the WPILib website). Open this folder in it, then:
 
@@ -206,23 +220,25 @@ You'll need the **WPILib VS Code** installation (from the WPILib website). Open 
 2. **Simulate:** `Ctrl+Shift+P` → "WPILib: Simulate Robot Code" (or `./gradlew simulateJava`). A simulation window will open.
    - In the sim GUI, set the robot to **Teleoperated** and drag a joystick or controller into the Joysticks slot.
    - Open **AdvantageScope**, connect to the simulator, and watch the robot's pose move on the field.
-3. **Deploy to the real robot:** connect to the robot's network, then run "WPILib: Deploy Robot Code" (or `./gradlew deploy`). **Ask a mentor first!**
+3. **Run the tests:** `./gradlew test`. If everything passes you'll see `BUILD SUCCESSFUL`. Run this before every PR!
+4. **Deploy to the real robot:** connect to the robot's network, then run "WPILib: Deploy Robot Code" (or `./gradlew deploy`). **Ask a mentor first!**
 
 ### Starter challenges
 - Change `DEADBAND` in `CONSTANTS.DriveConstants` and feel the difference in sim.
 - Find where the ✕ button is bound and add a binding for another button.
-- `publishAutoNames()` in `RobotContainer` fills in the auto dropdown, but it's never called. Find where it should be called and fix it. (Then make a branch and open a PR!)
+- Write your first unit test! `FieldUtil.getAlliance()` decides which alliance we're on, but nothing tests it yet. Look at `DrivetrainControllerTest` to see how tests pretend to be on red or blue, then check what it returns for red, blue, and no alliance at all. (Then make a branch and open a PR!)
 - Trace one joystick push all the way to a motor command. Which files and methods does it pass through?
 
 ---
 
-## 10. Glossary
+## 11. Glossary
 
 | Term | Meaning |
 |---|---|
 | **AprilTag** | A barcode-like marker on the field that cameras use to find the robot's position |
 | **CAN bus** | The wiring network that motors and sensors use to talk to the roboRIO |
 | **ChassisSpeeds** | The robot's overall motion: forward speed, sideways speed, and turning speed |
+| **CI (continuous integration)** | GitHub automatically building and testing every pull request |
 | **Deadband** | A small zone near zero where joystick input is ignored |
 | **Encoder** | A sensor that measures rotation (how far or how fast something has turned) |
 | **Field-relative** | Directions based on the field ("away from me"), not the robot ("the robot's front") |
@@ -235,6 +251,7 @@ You'll need the **WPILib VS Code** installation (from the WPILib website). Open 
 | **roboRIO** | The robot's main computer |
 | **Subsystem** | One mechanism of the robot, which owns its own hardware |
 | **Thread** | A separate "worker" running code at the same time as the main program |
+| **Unit test** | A small program that runs one piece of code and checks the answer is correct |
 | **Vendordep** | A library from a hardware company (CTRE, REV, Redux, PhotonVision), stored in `vendordeps/` |
 
 ---

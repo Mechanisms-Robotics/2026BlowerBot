@@ -13,6 +13,16 @@ public class BlowersIOSim implements BlowersIO {
         inputs.blower2Connected = true;
         inputs.blower2AppliedVolts = 12.0;
         inputs.blower2CurrentAmps = 5.0;
+
+        // Simulate blower 3
+        inputs.blower3Connected = true;
+        inputs.blower3AppliedVolts = 12.0;
+        inputs.blower3CurrentAmps = 5.0;
+
+        // Simulate blower 4
+        inputs.blower4Connected = true;
+        inputs.blower4AppliedVolts = 12.0;
+        inputs.blower4CurrentAmps = 5.0;
     }
 
     @Override

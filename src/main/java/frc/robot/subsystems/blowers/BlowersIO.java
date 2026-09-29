@@ -12,6 +12,14 @@ public interface BlowersIO {
         public boolean blower2Connected = false;
         public double blower2AppliedVolts = 0.0;
         public double blower2CurrentAmps = 0.0;
+
+        public boolean blower3Connected = false;
+        public double blower3AppliedVolts = 0.0;
+        public double blower3CurrentAmps = 0.0;
+
+        public boolean blower4Connected = false;
+        public double blower4AppliedVolts = 0.0;
+        public double blower4CurrentAmps = 0.0;
     }
 
     public default void updateInputs(BlowersIOInputs inputs) {}

@@ -11,7 +11,7 @@ public class BlowersIOSparkMax implements BlowersIO {
     private final SparkMax blower;
 
     public BlowersIOSparkMax() {
-        blower = new SparkMax(CONSTANTS.BlowerConstants.BLOWER1_CAN_ID, MotorType.kBrushed);
+        blower = new SparkMax(CONSTANTS.BlowerConstants.BLOWER_CAN_ID, MotorType.kBrushed);
     }
     
     @Override

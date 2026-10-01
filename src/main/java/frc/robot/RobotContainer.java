@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.blowers.Blowers;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.DrivetrainController;
 import frc.robot.subsystems.drivetrain.GyroIO;
@@ -44,6 +45,7 @@ public class RobotContainer {
 
     @SuppressWarnings("unused")
     private final Vision vision;
+    private final Blowers blowers;
     private final DrivetrainController drivetrainController;
     
     public final SendableChooser<String> autoChooser = new SendableChooser<>();
@@ -71,6 +73,7 @@ public class RobotContainer {
                     Transform3d.kZero, 
                     drivetrain.poseEstimator
                 ));
+            this.blowers = new Blowers();
         } else {
             this.drivetrain = new Drivetrain(
                 new GyroIORedux(),
@@ -100,6 +103,21 @@ public class RobotContainer {
             .onTrue(
                 new InstantCommand(() -> {
                     this.drivetrain.resetHeading();
+                })
+            );
+            
+        this.controller
+            .circle()
+            .onTrue(
+                new InstantCommand(() -> {
+                    this.blowers.blowersOn();
+                })
+            );
+        this.controller
+            .square()
+            .onTrue(
+                new InstantCommand(() -> {
+                    this.blowers.blowersOff();
                 })
             );
         

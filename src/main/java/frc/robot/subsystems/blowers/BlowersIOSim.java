@@ -29,12 +29,14 @@ public class BlowersIOSim implements BlowersIO {
     @Override
     public void blowerOn(BlowersIOInputs inputs) {
         // Implementation for turning blower on
-        blowerOutput = 1.0; // Simulate blower being on
+        blowerSim.setAppliedOutput(1.0); // Simulate blower being on
+        this.blowerOutput = blowerSim.getAppliedOutput(); // Simulate blower being on
     }
 
     @Override
     public void blowerOff(BlowersIOInputs inputs) {
         // Implementation for turning blower off
-        blowerOutput = 0.0; // Simulate blower being off
+        blowerSim.setAppliedOutput(0.0); // Simulate blower being off
+        this.blowerOutput = blowerSim.getAppliedOutput(); // Simulate blower being off
     }
 }

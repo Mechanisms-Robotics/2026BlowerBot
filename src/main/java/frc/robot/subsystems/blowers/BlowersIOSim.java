@@ -4,15 +4,18 @@ import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.system.plant.DCMotor;
 import frc.robot.CONSTANTS;
 
 public class BlowersIOSim implements BlowersIO {
 
     private double blowerOutput = 0.0;
+    private SparkMax blowerMotor;
     private SparkMaxSim blowerSim;
 
     public BlowersIOSim() {
-        blowerSim = new SparkMaxSim(CONSTANTS.BlowerConstants.BLOWER_CAN_ID, MotorType.kBrushed);
+        blowerMotor = new SparkMax(CONSTANTS.BlowerConstants.BLOWER_CAN_ID, MotorType.kBrushed);
+        blowerSim = new SparkMaxSim(blowerMotor, DCMotor.getNEO(1));
     }
 
     @Override

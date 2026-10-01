@@ -29,6 +29,10 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.CONSTANTS.BlowerConstants;
+import frc.robot.subsystems.blowers.Blowers;
+import frc.robot.subsystems.blowers.BlowersIOSim;
+import frc.robot.subsystems.blowers.BlowersIOSparkMax;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.DrivetrainController;
 import frc.robot.subsystems.drivetrain.GyroIO;
@@ -41,6 +45,7 @@ import frc.robot.subsystems.vision.PoseCameraIOSim;
 
 public class RobotContainer {
     public final Drivetrain drivetrain;
+    public final Blowers blowers;
 
     @SuppressWarnings("unused")
     private final Vision vision;
@@ -71,6 +76,14 @@ public class RobotContainer {
                     Transform3d.kZero, 
                     drivetrain.poseEstimator
                 ));
+
+            // SIMULATOR: 4 pretend blowers (CAN IDs 10, 11, 12, 13)
+            this.blowers = new Blowers(
+                new BlowersIOSim(BlowerConstants.BLOWER1_CAN_ID),
+                new BlowersIOSim(BlowerConstants.BLOWER2_CAN_ID),
+                new BlowersIOSim(BlowerConstants.BLOWER3_CAN_ID),
+                new BlowersIOSim(BlowerConstants.BLOWER4_CAN_ID)
+            );
         } else {
             this.drivetrain = new Drivetrain(
                 new GyroIORedux(),
@@ -86,6 +99,14 @@ public class RobotContainer {
                 new PoseCameraIOPhoton(VisionConstants.CAMERA1_NAME, VisionConstants.CAMERA1_TRANSFORM3D),
                 new PoseCameraIOPhoton(VisionConstants.CAMERA2_NAME, VisionConstants.CAMERA2_TRANSFORM3D)
             );
+
+            // REAL ROBOT: 4 real blowers (CAN IDs 10, 11, 12, 13)
+            this.blowers = new Blowers(
+                new BlowersIOSparkMax(BlowerConstants.BLOWER1_CAN_ID),
+                new BlowersIOSparkMax(BlowerConstants.BLOWER2_CAN_ID),
+                new BlowersIOSparkMax(BlowerConstants.BLOWER3_CAN_ID),
+                new BlowersIOSparkMax(BlowerConstants.BLOWER4_CAN_ID)
+            );
         }
 
         this.drivetrainController = new DrivetrainController(this.drivetrain);
@@ -95,6 +116,9 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+        // Press Square once = all blowers ON. Press again = all OFF.
+        this.controller.square().toggleOnTrue(this.blowers.runBlowers());
+
         this.controller
             .cross()
             .onTrue(

@@ -1,6 +1,6 @@
 package frc.robot.subsystems.blowers;
 
-import com.ctre.phoenix6.sim.TalonFXSimState.MotorType;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkMax;
 

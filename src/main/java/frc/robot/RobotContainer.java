@@ -89,6 +89,7 @@ public class RobotContainer {
                 new PoseCameraIOPhoton(VisionConstants.CAMERA1_NAME, VisionConstants.CAMERA1_TRANSFORM3D),
                 new PoseCameraIOPhoton(VisionConstants.CAMERA2_NAME, VisionConstants.CAMERA2_TRANSFORM3D)
             );
+            this.blowers = new Blowers();
         }
 
         this.drivetrainController = new DrivetrainController(this.drivetrain);

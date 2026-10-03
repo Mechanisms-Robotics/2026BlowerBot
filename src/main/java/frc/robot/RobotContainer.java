@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import frc.robot.CONSTANTS.DriveConstants;
 import frc.robot.CONSTANTS.VisionConstants;
+import frc.robot.commands.autos.TestAuto;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -42,8 +43,9 @@ import frc.robot.subsystems.vision.PoseCameraIOSim;
 public class RobotContainer {
     public final Drivetrain drivetrain;
 
-    @SuppressWarnings("unused")
-    private final Vision vision;
+    // Disabling vision for SCRIW 
+    // @SuppressWarnings("unused")
+    // private final Vision vision;
     private final DrivetrainController drivetrainController;
     
     public final SendableChooser<String> autoChooser = new SendableChooser<>();
@@ -64,13 +66,13 @@ public class RobotContainer {
                 new ModuleIOSim(DriveConstants.BACK_RIGHT)
             );
 
-            this.vision = new Vision(
-                this.drivetrain.poseEstimator,
-                new PoseCameraIOSim(
-                    "Photon_Camera_Sim1", 
-                    Transform3d.kZero, 
-                    drivetrain.poseEstimator
-                ));
+            // this.vision = new Vision(
+            //     this.drivetrain.poseEstimator,
+            //     new PoseCameraIOSim(
+            //         "Photon_Camera_Sim1", 
+            //         Transform3d.kZero, 
+            //         drivetrain.poseEstimator
+            //     ));
         } else {
             this.drivetrain = new Drivetrain(
                 new GyroIORedux(),
@@ -81,16 +83,17 @@ public class RobotContainer {
         
             );
            
-            this.vision = new Vision(
-                this.drivetrain.poseEstimator,
-                new PoseCameraIOPhoton(VisionConstants.CAMERA1_NAME, VisionConstants.CAMERA1_TRANSFORM3D),
-                new PoseCameraIOPhoton(VisionConstants.CAMERA2_NAME, VisionConstants.CAMERA2_TRANSFORM3D)
-            );
+            // this.vision = new Vision(
+            //     this.drivetrain.poseEstimator,
+            //     new PoseCameraIOPhoton(VisionConstants.CAMERA1_NAME, VisionConstants.CAMERA1_TRANSFORM3D),
+            //     new PoseCameraIOPhoton(VisionConstants.CAMERA2_NAME, VisionConstants.CAMERA2_TRANSFORM3D)
+            // );
         }
 
         this.drivetrainController = new DrivetrainController(this.drivetrain);
 
         configureBindings();
+        publishAutoNames();
         SmartDashboard.putData("CommandScheduler", CommandScheduler.getInstance());
     }
 
@@ -154,6 +157,7 @@ public class RobotContainer {
     private void publishAutoNames() {
         // add commands to the autos hashmap here
         autos.put("None", () -> Commands.none());
+        autos.put("Test Auto", () -> new TestAuto(drivetrain));
         
 
         for (String name : autos.keySet()) {

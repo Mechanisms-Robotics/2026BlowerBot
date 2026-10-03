@@ -263,9 +263,14 @@ public class CONSTANTS {
             .withSteerFrictionVoltage(STEER_FRICTION_VOLTAGE)
             .withDriveFrictionVoltage(DRIVE_FRICTION_VOLTAGE);
 
-        private static final double TRACK_WIDTH_METERS = 0.55;
-        private static final double TRACK_LENGTH_METERS = 0.55;
+        private static final double TRACK_WIDTH_METERS = 0.526;
+        private static final double TRACK_LENGTH_METERS = 0.596;
     
+        // Can ID convention for drivetrain:
+        // 1-4: Drive motors (FL, FR, BL, BR)
+        // 5-8: Steer motors (FL, FR, BL, BR)
+        // 1-4: Steer encoders (FL, FR, BL, BR)
+
         // Front Left
         private static final int FRONT_LEFT_DRIVE_MOTOR_ID = 1;
         private static final int FRONT_LEFT_STEER_MOTOR_ID = 5;
@@ -293,9 +298,9 @@ public class CONSTANTS {
         private static final Distance FRONT_RIGHT_Y_POS = Meters.of(-TRACK_WIDTH_METERS / 2);
 
         // Back Left
-        private static final int BACK_LEFT_DRIVE_MOTOR_ID = 4; // this is swapped with steer on Mechiatto for some reason
-        private static final int BACK_LEFT_STEER_MOTOR_ID = 8;
-        private static final int BACK_LEFT_ENCODER_ID = 4;
+        private static final int BACK_LEFT_DRIVE_MOTOR_ID = 3;
+        private static final int BACK_LEFT_STEER_MOTOR_ID = 7;
+        private static final int BACK_LEFT_ENCODER_ID = 3;
         private static final Angle BACK_LEFT_ENCODER_OFFSET = Rotations.of(
             0
         );
@@ -306,9 +311,9 @@ public class CONSTANTS {
         private static final Distance BACK_LEFT_Y_POS = Meters.of(TRACK_WIDTH_METERS / 2);
 
         // Back Right
-        private static final int BACK_RIGHT_DRIVE_MOTOR_ID = 3; // this is swapped with steer on Mechiatto for some reason
-        private static final int BACK_RIGHT_STEER_MOTOR_ID = 7;
-        private static final int BACK_RIGHT_ENCODER_ID = 3;
+        private static final int BACK_RIGHT_DRIVE_MOTOR_ID = 4;
+        private static final int BACK_RIGHT_STEER_MOTOR_ID = 8;
+        private static final int BACK_RIGHT_ENCODER_ID = 4;
         private static final Angle BACK_RIGHT_ENOCDER_OFFSET = Rotations.of(
             0
         );

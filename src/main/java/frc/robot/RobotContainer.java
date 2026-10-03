@@ -99,10 +99,10 @@ public class RobotContainer {
 
             this.blowers = new Blowers(
                 new BlowersIOSparkMax(BlowerConstants.BLOWER1_CAN_ID),
-                new BlowersIOSparkMax(BlowerConstants.BLOWER2_CAN_ID),
-                new BlowersIOSparkMax(BlowerConstants.BLOWER3_CAN_ID),
-                new BlowersIOSparkMax(BlowerConstants.BLOWER4_CAN_ID),
-                new BlowersIOSparkMax(BlowerConstants.BLOWER5_CAN_ID)
+                new BlowersIO() {},
+                new BlowersIO() {},
+                new BlowersIO() {},
+                new BlowersIO() {}
             );
         } else {
             this.drivetrain = new Drivetrain(

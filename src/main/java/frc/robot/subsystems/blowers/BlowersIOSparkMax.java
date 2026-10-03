@@ -25,13 +25,13 @@ public class BlowersIOSparkMax implements BlowersIO {
     }
 
     @Override
-    public void blowerOn(BlowersIOInputs inputs) {
+    public void blowerOn() {
         // Implementation for turning blower on
         blower.getClosedLoopController().setSetpoint(1.0, ControlType.kDutyCycle);
     }
 
     @Override
-    public void blowerOff(BlowersIOInputs inputs) {
+    public void blowerOff() {
         // Implementation for turning blower off
         blower.getClosedLoopController().setSetpoint(0.0, ControlType.kDutyCycle);
     }

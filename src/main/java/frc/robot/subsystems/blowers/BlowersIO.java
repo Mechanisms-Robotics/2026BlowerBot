@@ -16,7 +16,7 @@ public interface BlowersIO {
 
     public default void updateInputs(BlowersIOInputs inputs) {}
 
-    public default void blowerOn(BlowersIOInputs inputs) {}
+    public default void blowerOn() {}
 
-    public default void blowerOff(BlowersIOInputs inputs) {}
+    public default void blowerOff() {}
 }

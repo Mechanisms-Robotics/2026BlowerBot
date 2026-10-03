@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.blowers.Blowers;
+import frc.robot.subsystems.blowers.BlowersIOSim;
+import frc.robot.subsystems.blowers.BlowersIOSparkMax;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.DrivetrainController;
 import frc.robot.subsystems.drivetrain.GyroIO;
@@ -73,7 +75,13 @@ public class RobotContainer {
                     Transform3d.kZero, 
                     drivetrain.poseEstimator
                 ));
-            this.blowers = new Blowers();
+            blowers = new Blowers(
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER1_CAN_ID),
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER2_CAN_ID),
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER3_CAN_ID),
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER4_CAN_ID),
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER5_CAN_ID)
+            );
         } else {
             this.drivetrain = new Drivetrain(
                 new GyroIORedux(),
@@ -89,7 +97,13 @@ public class RobotContainer {
                 new PoseCameraIOPhoton(VisionConstants.CAMERA1_NAME, VisionConstants.CAMERA1_TRANSFORM3D),
                 new PoseCameraIOPhoton(VisionConstants.CAMERA2_NAME, VisionConstants.CAMERA2_TRANSFORM3D)
             );
-            this.blowers = new Blowers();
+            this.blowers = new Blowers(
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER1_CAN_ID),
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER2_CAN_ID),
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER3_CAN_ID),
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER4_CAN_ID),
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER5_CAN_ID)
+            );
         }
 
         this.drivetrainController = new DrivetrainController(this.drivetrain);
@@ -108,20 +122,21 @@ public class RobotContainer {
             );
             
         this.controller
-            .circle()
-            .onTrue(
-                new InstantCommand(() -> {
-                    this.blowers.blowersOn();
-                })
-            );
+            .circle().onTrue(blowers.commandAllOn());
         this.controller
-            .square()
-            .onTrue(
-                new InstantCommand(() -> {
-                    this.blowers.blowersOff();
-                })
-            );
-        
+            .square().onTrue(blowers.commandAllOff());
+        this.controller
+            .L1().onTrue(blowers.commandBlowerOn(0))
+            .onFalse(blowers.commandBlowerOff(0));
+        this.controller
+            .R1().onTrue(blowers.commandBlowerOn(1))
+            .onFalse(blowers.commandBlowerOff(1));
+        this.controller
+            .L2().onTrue(blowers.commandBlowerOn(2))
+            .onFalse(blowers.commandBlowerOff(2));
+        this.controller
+            .R2().onTrue(blowers.commandBlowerOn(3))
+            .onFalse(blowers.commandBlowerOff(3));
         this.drivetrain.setDefaultCommand(
             new RunCommand(
                 () -> {

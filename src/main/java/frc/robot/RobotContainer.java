@@ -122,9 +122,8 @@ public class RobotContainer {
             );
             
         this.controller
-            .circle().onTrue(blowers.commandAllOn());
-        this.controller
-            .square().onTrue(blowers.commandAllOff());
+            .circle().onTrue(blowers.commandAllOn())
+            .onFalse(blowers.commandAllOff());
         this.controller
             .L1().onTrue(blowers.commandBlowerOn(0))
             .onFalse(blowers.commandBlowerOff(0));

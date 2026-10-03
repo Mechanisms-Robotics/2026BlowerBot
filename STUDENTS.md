@@ -100,7 +100,25 @@ WPILib uses a standard layout. Memorize it!
 
 ---
 
-## 5. "Where Am I?": Odometry and Pose Estimation
+## 5. The Blowers (`subsystems/blowers/`)
+
+If the drivetrain felt like a lot, the **blowers** are the opposite: the simplest subsystem in the codebase, and a good first one to read end-to-end.
+
+Each blower is just a motor that's either **fully on** or **fully off** — there's no speed control, no PID, no sensor feedback we act on. `BlowersIO` is the contract (same pattern as `ModuleIO`): `blowerOn()`, `blowerOff()`, and `updateInputs()` for logging voltage/current. `BlowersIOSparkMax` drives a real SparkMax; `BlowersIOSim` fakes one in simulation by snapping straight to a made-up free speed instead of modeling spin-up time, since we don't care how long it takes to get there.
+
+`Blowers.java` owns all four motors and exposes both plain methods (`blowerOn(index)`, `allOn()`, ...) and **command** versions of the same actions (`blowerOnCommand(index)`, `allOnCommand()`, ...) built with `Commands.runOnce(...)`. The command versions are what get bound to buttons, so the `CommandScheduler` can track that they're using the `Blowers` subsystem.
+
+In `RobotContainer.configureBindings()`, the four bumpers/triggers run one blower each while held (`onTrue` turns it on, `onFalse` turns it back off), and `○`/`□` are quick "all on"/"all off" buttons:
+
+```java
+controller.L1().onTrue(blowers.blowerOnCommand(0)).onFalse(blowers.blowerOffCommand(0));
+controller.circle().onTrue(blowers.allOnCommand());
+controller.square().onTrue(blowers.allOffCommand());
+```
+
+---
+
+## 6. "Where Am I?": Odometry and Pose Estimation
 
 The robot's **pose** is its position on the field (x, y) plus the direction it's facing. Knowing the pose is essential for autonomous routines and for field-relative driving.
 
@@ -121,7 +139,7 @@ AprilTags are the square black-and-white barcodes placed at known spots around t
 
 ---
 
-## 6. Autonomous (`commands/FollowPath.java`)
+## 7. Autonomous (`commands/FollowPath.java`)
 
 During the 20-second autonomous period, the robot drives itself. We plan paths in **Choreo**, a desktop app that creates smooth, time-optimized trajectories. The path files are saved into `src/main/deploy/` so they get copied to the robot.
 
@@ -137,7 +155,7 @@ Autos are registered by name in `RobotContainer.publishAutoNames()` and picked f
 
 ---
 
-## 7. Why Every Subsystem Has an "IO" Interface
+## 8. Why Every Subsystem Has an "IO" Interface
 
 This is the most important design pattern in the repo, and the one that confuses new members most. Take your time here.
 
@@ -182,7 +200,7 @@ Logger.processInputs("Drive/Module FL", inputs); // 2. log them
 
 ---
 
-## 8. Logging and Replay (AdvantageKit + AdvantageScope)
+## 9. Logging and Replay (AdvantageKit + AdvantageScope)
 
 We use **AdvantageKit** to record nearly everything the robot sees and does. Afterwards, we can open the log in **AdvantageScope** to view graphs, a 3D field, and even a 3D model of our robot (from `ascope_assets/`).
 
@@ -198,7 +216,7 @@ The robot runs in one of three **modes** (`CONSTANTS.Mode`):
 
 ---
 
-## 9. Try It Yourself
+## 10. Try It Yourself
 
 You'll need the **WPILib VS Code** installation (from the WPILib website). Open this folder in it, then:
 
@@ -216,7 +234,7 @@ You'll need the **WPILib VS Code** installation (from the WPILib website). Open 
 
 ---
 
-## 10. Glossary
+## 11. Glossary
 
 | Term | Meaning |
 |---|---|

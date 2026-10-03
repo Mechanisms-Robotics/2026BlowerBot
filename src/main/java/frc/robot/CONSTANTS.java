@@ -129,6 +129,12 @@ public class CONSTANTS {
         ? Mode.REAL
         : SIM_MODE;
 
+    // When true, RobotContainer skips instantiating real hardware IO for every
+    // mechanism except Blower1, using no-op IO objects instead. Useful for bench
+    // testing a single mechanism without the rest of the robot (swerve, other
+    // blowers, etc.) wired up on the CAN bus. Set back to false once fully assembled.
+    public static final boolean BENCH_TEST_MODE = true;
+
     public static enum Mode {
         /** Running on a real robot. */
         REAL,

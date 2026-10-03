@@ -2,8 +2,6 @@ package frc.robot.subsystems.blowers;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import com.revrobotics.spark.SparkMax;
-
 public interface BlowersIO {
     @AutoLog
     public static class BlowersIOInputs {
@@ -12,9 +10,12 @@ public interface BlowersIO {
         public double blowerCurrentAmps = 0.0;
     }
 
+    /** Updates the set of loggable inputs. */
     public default void updateInputs(BlowersIOInputs inputs) {}
 
-    public default void blowerOn(BlowersIOInputs inputs) {}
+    /** Runs the blower at full output. */
+    public default void blowerOn() {}
 
-    public default void blowerOff(BlowersIOInputs inputs) {}
+    /** Stops the blower. */
+    public default void blowerOff() {}
 }

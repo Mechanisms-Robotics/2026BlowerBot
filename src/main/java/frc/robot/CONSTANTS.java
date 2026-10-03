@@ -75,7 +75,10 @@ public class CONSTANTS {
 
     // MARK: Blowers
     public static class BlowerConstants {
-        public static final int BLOWER_CAN_ID = 10;
+        public static final int BLOWER1_CAN_ID = 10;
+        public static final int BLOWER2_CAN_ID = 11;
+        public static final int BLOWER3_CAN_ID = 12;
+        public static final int BLOWER4_CAN_ID = 13;
 
         public static final double BLOWER_MAX_VOLTAGE = 12.0;
         public static final double BLOWER_MAX_CURRENT = 40.0; // Amps

@@ -10,8 +10,8 @@ public class BlowersIOSparkMax implements BlowersIO {
 
     private final SparkMax blower;
 
-    public BlowersIOSparkMax() {
-        blower = new SparkMax(CONSTANTS.BlowerConstants.BLOWER_CAN_ID, MotorType.kBrushed);
+    public BlowersIOSparkMax(int blowerId) {
+        blower = new SparkMax(blowerId, MotorType.kBrushed);
     }
     
     @Override
@@ -20,6 +20,8 @@ public class BlowersIOSparkMax implements BlowersIO {
         inputs.blowerConnected = true; // Example value
         inputs.blowerAppliedVolts = 12.0; // Example value
         inputs.blowerCurrentAmps = 5.0; // Example value
+        inputs.blowerVelocityRPM = blower.getEncoder().getVelocity(); // Example value
+        inputs.blowerPositionRots = blower.getEncoder().getPosition(); // Example value
     }
 
     @Override

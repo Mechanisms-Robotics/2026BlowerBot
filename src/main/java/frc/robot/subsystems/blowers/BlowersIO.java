@@ -10,6 +10,8 @@ public interface BlowersIO {
         public boolean blowerConnected = false;
         public double blowerAppliedVolts = 0.0;
         public double blowerCurrentAmps = 0.0;
+        public double blowerVelocityRPM = 0.0;
+        public double blowerPositionRots = 0.0;
     }
 
     public default void updateInputs(BlowersIOInputs inputs) {}

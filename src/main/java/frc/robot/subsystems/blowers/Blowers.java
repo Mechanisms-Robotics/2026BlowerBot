@@ -12,24 +12,24 @@ public class Blowers {
     private final BlowersIOInputs inputs;
     
     public Blowers() {
-        // if (CONSTANTS.CURRENT_MODE == CONSTANTS.SIM_MODE) {
-        //     this.blower1 = new BlowersIOSim() {}; 
-        //     this.blower2 = new BlowersIOSim() {};
-        //     this.blower3 = new BlowersIOSim() {};
-        //     this.blower4 = new BlowersIOSim() {};
-        //     this.inputs = new BlowersIOInputs() {};
-        // } else {
-        //     this.blower1 = new BlowersIOSparkMax() {};
-        //     this.blower2 = new BlowersIOSparkMax() {};
-        //     this.blower3 = new BlowersIOSparkMax() {};
-        //     this.blower4 = new BlowersIOSparkMax() {};
-        //     this.inputs = new BlowersIOInputs() {};
-        // }
-        this.blower1 = new BlowersIO() {};
-        this.blower2 = new BlowersIO() {};
-        this.blower3 = new BlowersIO() {};
-        this.blower4 = new BlowersIO() {};
-        this.inputs = new BlowersIOInputs() {};
+        if (CONSTANTS.CURRENT_MODE == CONSTANTS.SIM_MODE) {
+            this.blower1 = new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER1_CAN_ID) {}; 
+            this.blower2 = new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER2_CAN_ID) {};
+            this.blower3 = new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER3_CAN_ID) {};
+            this.blower4 = new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER4_CAN_ID) {};
+            this.inputs = new BlowersIOInputs() {};
+        } else {
+            this.blower1 = new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER1_CAN_ID) {};
+            this.blower2 = new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER2_CAN_ID) {};
+            this.blower3 = new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER3_CAN_ID) {};
+            this.blower4 = new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER4_CAN_ID) {};
+            this.inputs = new BlowersIOInputs() {};
+        }
+        // this.blower1 = new BlowersIO() {};
+        // this.blower2 = new BlowersIO() {};
+        // this.blower3 = new BlowersIO() {};
+        // this.blower4 = new BlowersIO() {};
+        // this.inputs = new BlowersIOInputs() {};
     }
 
     public void blowersOn() {
@@ -44,5 +44,16 @@ public class Blowers {
         this.blower2.blowerOff(this.inputs);
         this.blower3.blowerOff(this.inputs);
         this.blower4.blowerOff(this.inputs);
+    }
+
+    public void updateInputs() {
+        this.blower1.updateInputs(this.inputs);
+        this.blower2.updateInputs(this.inputs);
+        this.blower3.updateInputs(this.inputs);
+        this.blower4.updateInputs(this.inputs);
+    }
+
+    public void periodic() {
+        this.updateInputs();
     }
 }

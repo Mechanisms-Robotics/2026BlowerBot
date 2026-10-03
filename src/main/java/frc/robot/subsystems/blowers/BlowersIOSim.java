@@ -31,14 +31,6 @@ public class BlowersIOSim implements BlowersIO {
         inputs.blowerConnected = true;
         inputs.blowerAppliedVolts = blowerSim.getAppliedOutput() * 12.0;
         inputs.blowerCurrentAmps = blowerSim.getMotorCurrent();
-        
-        // Manually calculate velocity based on applied output
-        // double targetVelocity = blowerSim.getAppliedOutput() * MAX_RPM;
-        // blowerVelocity += (targetVelocity - blowerVelocity) * 0.1; // Simple ramp-up
-        // blowerPosition += blowerVelocity * 0.02 / 60.0; // Convert RPM to rotations per 20ms
-        
-        // inputs.blowerVelocityRPM = blowerVelocity;
-        // inputs.blowerPositionRots = blowerPosition;
     }
 
     @Override

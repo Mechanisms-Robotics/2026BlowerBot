@@ -17,11 +17,9 @@ public class BlowersIOSparkMax implements BlowersIO {
     @Override
     public void updateInputs(BlowersIOInputs inputs) {
         // Implementation for updating inputs from Spark Max
-        inputs.blowerConnected = true; // Example value
-        inputs.blowerAppliedVolts = 12.0; // Example value
-        inputs.blowerCurrentAmps = 5.0; // Example value
-        inputs.blowerVelocityRPM = blower.getEncoder().getVelocity(); // Example value
-        inputs.blowerPositionRots = blower.getEncoder().getPosition(); // Example value
+        inputs.blowerConnected = !blower.hasActiveFault();
+        inputs.blowerAppliedVolts = blower.getAppliedOutput() * 12.0;
+        inputs.blowerCurrentAmps = blower.getOutputCurrent();
     }
 
     @Override

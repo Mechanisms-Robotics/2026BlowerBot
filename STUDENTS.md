@@ -106,14 +106,14 @@ If the drivetrain felt like a lot, the **blowers** are the opposite: the simples
 
 Each blower is just a motor that's either **fully on** or **fully off** — there's no speed control, no PID, no sensor feedback we act on. `BlowersIO` is the contract (same pattern as `ModuleIO`): `blowerOn()`, `blowerOff()`, and `updateInputs()` for logging voltage/current. `BlowersIOSparkMax` drives a real SparkMax; `BlowersIOSim` fakes one in simulation by snapping straight to a made-up free speed instead of modeling spin-up time, since we don't care how long it takes to get there.
 
-`Blowers.java` owns all four motors and exposes both plain methods (`blowerOn(index)`, `allOn()`, ...) and **command** versions of the same actions (`blowerOnCommand(index)`, `allOnCommand()`, ...) built with `Commands.runOnce(...)`. The command versions are what get bound to buttons, so the `CommandScheduler` can track that they're using the `Blowers` subsystem.
+`Blowers.java` owns all five motors (indices 0-4) and exposes **command** factory methods (`commandBlowerOn(index)`, `commandBlowerOff(index)`, `commandAllOn()`, `commandAllOff()`) built with `Commands.runOnce(...)`. The underlying `blowerOn(index)`/`allOn()`/etc. helpers are private — only `Blowers` itself needs them, and the commands are the only thing anything outside the class should bind to.
 
-In `RobotContainer.configureBindings()`, the four bumpers/triggers run one blower each while held (`onTrue` turns it on, `onFalse` turns it back off), and `○`/`□` are quick "all on"/"all off" buttons:
+In `RobotContainer.configureBindings()`, four bumpers/triggers each run one blower while held (`onTrue` turns it on, `onFalse` turns it back off), and `○`/`□` are "all on"/"all off" buttons that include **every** blower, even the 5th one, which has no individual binding of its own:
 
 ```java
-controller.L1().onTrue(blowers.blowerOnCommand(0)).onFalse(blowers.blowerOffCommand(0));
-controller.circle().onTrue(blowers.allOnCommand());
-controller.square().onTrue(blowers.allOffCommand());
+controller.L1().onTrue(blowers.commandBlowerOn(0)).onFalse(blowers.commandBlowerOff(0));
+controller.circle().onTrue(blowers.commandAllOn());   // includes blower 5
+controller.square().onTrue(blowers.commandAllOff());  // includes blower 5
 ```
 
 ---

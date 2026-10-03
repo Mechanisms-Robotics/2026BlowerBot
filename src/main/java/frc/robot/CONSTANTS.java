@@ -79,6 +79,7 @@ public class CONSTANTS {
         public static final int BLOWER2_CAN_ID = 11;
         public static final int BLOWER3_CAN_ID = 12;
         public static final int BLOWER4_CAN_ID = 13;
+        public static final int BLOWER5_CAN_ID = 14;
 
         public static final double BLOWER_MAX_VOLTAGE = 12.0;
         public static final double BLOWER_MAX_CURRENT = 40.0; // Amps

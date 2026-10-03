@@ -80,7 +80,8 @@ public class RobotContainer {
                 new BlowersIOSim(BlowerConstants.BLOWER1_CAN_ID),
                 new BlowersIOSim(BlowerConstants.BLOWER2_CAN_ID),
                 new BlowersIOSim(BlowerConstants.BLOWER3_CAN_ID),
-                new BlowersIOSim(BlowerConstants.BLOWER4_CAN_ID)
+                new BlowersIOSim(BlowerConstants.BLOWER4_CAN_ID),
+                new BlowersIOSim(BlowerConstants.BLOWER5_CAN_ID)
             );
         } else if (CONSTANTS.BENCH_TEST_MODE) {
             // Bench test: only Blower1 touches real CAN hardware. Everything else
@@ -98,9 +99,10 @@ public class RobotContainer {
 
             this.blowers = new Blowers(
                 new BlowersIOSparkMax(BlowerConstants.BLOWER1_CAN_ID),
-                new BlowersIO() {},
-                new BlowersIO() {},
-                new BlowersIO() {}
+                new BlowersIOSparkMax(BlowerConstants.BLOWER2_CAN_ID),
+                new BlowersIOSparkMax(BlowerConstants.BLOWER3_CAN_ID),
+                new BlowersIOSparkMax(BlowerConstants.BLOWER4_CAN_ID),
+                new BlowersIOSparkMax(BlowerConstants.BLOWER5_CAN_ID)
             );
         } else {
             this.drivetrain = new Drivetrain(
@@ -122,7 +124,8 @@ public class RobotContainer {
                 new BlowersIOSparkMax(BlowerConstants.BLOWER1_CAN_ID),
                 new BlowersIOSparkMax(BlowerConstants.BLOWER2_CAN_ID),
                 new BlowersIOSparkMax(BlowerConstants.BLOWER3_CAN_ID),
-                new BlowersIOSparkMax(BlowerConstants.BLOWER4_CAN_ID)
+                new BlowersIOSparkMax(BlowerConstants.BLOWER4_CAN_ID),
+                new BlowersIOSparkMax(BlowerConstants.BLOWER5_CAN_ID)
             );
         }
 

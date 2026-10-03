@@ -14,9 +14,10 @@ public class Blowers extends SubsystemBase {
         BlowersIO blower1,
         BlowersIO blower2,
         BlowersIO blower3,
-        BlowersIO blower4
+        BlowersIO blower4,
+        BlowersIO blower5
     ) {
-        this.ios = new BlowersIO[] { blower1, blower2, blower3, blower4 };
+        this.ios = new BlowersIO[] { blower1, blower2, blower3, blower4, blower5 };
         this.inputs = new BlowersIOInputsAutoLogged[ios.length];
 
         for (int i = 0; i < ios.length; i++) {
@@ -32,12 +33,12 @@ public class Blowers extends SubsystemBase {
         }
     }
 
-    /** Turns the specified blower (0-3) on. */
+    /** Turns the specified blower (0-4) on. */
     private void blowerOn(int index) {
         ios[index].blowerOn();
     }
 
-    /** Turns the specified blower (0-3) off. */
+    /** Turns the specified blower (0-4) off. */
     private void blowerOff(int index) {
         ios[index].blowerOff();
     }
@@ -56,12 +57,12 @@ public class Blowers extends SubsystemBase {
         }
     }
 
-    /** Command that turns the specified blower (0-3) on. */
+    /** Command that turns the specified blower (0-4) on. */
     public Command commandBlowerOn(int index) {
         return Commands.runOnce(() -> blowerOn(index), this);
     }
 
-    /** Command that turns the specified blower (0-3) off. */
+    /** Command that turns the specified blower (0-4) off. */
     public Command commandBlowerOff(int index) {
         return Commands.runOnce(() -> blowerOff(index), this);
     }

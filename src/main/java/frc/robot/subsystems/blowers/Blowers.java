@@ -27,21 +27,21 @@ public class Blowers extends SubsystemBase {
         }
     }
 
-    public void blowerOn(int index) {
+    private void blowerOn(int index) {
         ios[index].blowerOn();
     }
 
-    public void blowerOff(int index) {
+    private void blowerOff(int index) {
         ios[index].blowerOff();
     }
 
-    public void allOn() {
+    private void allOn() {
         for (BlowersIO io : ios) {
             io.blowerOn();
         }
     }
 
-    public void allOff() {
+    private void allOff() {
         for (BlowersIO io : ios) {
             io.blowerOff();
         }
@@ -56,10 +56,10 @@ public class Blowers extends SubsystemBase {
     }
 
     public Command commandAllOn() {
-        return runOnce(this::allOn);
+        return runOnce(() -> allOn());
     }
 
     public Command commandAllOff() {
-        return runOnce(this::allOff);
+        return runOnce(() -> allOff());
     }
 }

@@ -4,8 +4,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import frc.robot.CONSTANTS;
-
 public class BlowersIOSparkMax implements BlowersIO {
 
     private final SparkMax blower;
@@ -18,7 +16,7 @@ public class BlowersIOSparkMax implements BlowersIO {
     public void updateInputs(BlowersIOInputs inputs) {
         // Implementation for updating inputs from Spark Max
         inputs.blowerConnected = !blower.hasActiveFault();
-        inputs.blowerAppliedVolts = blower.getAppliedOutput() * 12.0;
+        inputs.blowerAppliedVolts = blower.getAppliedOutput() * blower.getBusVoltage();
         inputs.blowerCurrentAmps = blower.getOutputCurrent();
     }
 

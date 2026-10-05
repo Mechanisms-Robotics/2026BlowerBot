@@ -6,13 +6,11 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.CONSTANTS;
 
 public class BlowersIOSim implements BlowersIO {
 
-    private double blowerVelocity = 0.0;
-    private double blowerPosition = 0.0;
-    private static final double MAX_RPM = 5676.0; // NEO max RPM
     private SparkMax blowerMotor;
     private SparkMaxSim blowerSim;
     private boolean on = false;
@@ -24,12 +22,14 @@ public class BlowersIOSim implements BlowersIO {
 
     @Override
     public void updateInputs(BlowersIOInputs inputs) {
+        double vbus = RobotController.getBatteryVoltage();
+
         // Update the simulation
-        blowerSim.iterate(on ? CONSTANTS.BlowerConstants.BLOWER_MAX_RPM : 0.0, 12.0, 0.02);
-        
+        blowerSim.iterate(on ? CONSTANTS.BlowerConstants.BLOWER_MAX_RPM : 0.0, vbus, CONSTANTS.ROBOT_LOOP_PERIOD);
+
         // Read values from simulation
         inputs.blowerConnected = true;
-        inputs.blowerAppliedVolts = blowerSim.getAppliedOutput() * 12.0;
+        inputs.blowerAppliedVolts = blowerSim.getAppliedOutput() * vbus;
         inputs.blowerCurrentAmps = blowerSim.getMotorCurrent();
     }
 

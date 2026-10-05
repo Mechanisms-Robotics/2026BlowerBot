@@ -30,12 +30,14 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.blowers.Blowers;
+import frc.robot.subsystems.blowers.BlowersIO;
 import frc.robot.subsystems.blowers.BlowersIOSim;
 import frc.robot.subsystems.blowers.BlowersIOSparkMax;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.DrivetrainController;
 import frc.robot.subsystems.drivetrain.GyroIO;
 import frc.robot.subsystems.drivetrain.GyroIORedux;
+import frc.robot.subsystems.drivetrain.ModuleIO;
 import frc.robot.subsystems.drivetrain.ModuleIOSim;
 import frc.robot.subsystems.drivetrain.ModuleIOTalonFXRedux;
 import frc.robot.subsystems.vision.Vision;
@@ -187,7 +189,6 @@ public class RobotContainer {
     private void publishAutoNames() {
         // add commands to the autos hashmap here
         autos.put("None", () -> Commands.none());
-        
 
         for (String name : autos.keySet()) {
             autoChooser.addOption(name, name);

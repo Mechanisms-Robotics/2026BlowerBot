@@ -111,6 +111,7 @@ public class RobotContainer {
         this.drivetrainController = new DrivetrainController(this.drivetrain);
 
         configureBindings();
+        publishAutoNames();
         SmartDashboard.putData("CommandScheduler", CommandScheduler.getInstance());
     }
 
@@ -206,9 +207,11 @@ public class RobotContainer {
         return autoCommand;
     }
 
-    private static Translation2d getDriveVelocity(double x, double y) {
+    // Package-private so it can be unit tested
+    static Translation2d getDriveVelocity(double x, double y) {
+        // Clamp to 1 so a full diagonal stick isn't faster than full forward
         double linearMag = MathUtil.applyDeadband(
-            Math.hypot(x, y),
+            Math.min(Math.hypot(x, y), 1.0),
             DriveConstants.DEADBAND
         );
         Rotation2d direction = new Rotation2d(Math.atan2(y, x));

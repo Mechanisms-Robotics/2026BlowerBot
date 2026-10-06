@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public class Robot extends LoggedRobot {
   private Command autonomousCommand;
@@ -77,7 +78,9 @@ public class Robot extends LoggedRobot {
   }
   
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    robotContainer.blowers.commandAllOff().schedule();
+  }
   
   @Override
   public void disabledPeriodic() {

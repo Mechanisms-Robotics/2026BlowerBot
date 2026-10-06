@@ -46,10 +46,10 @@ import frc.robot.subsystems.vision.PoseCameraIOSim;
 
 public class RobotContainer {
     public final Drivetrain drivetrain;
+    public final Blowers blowers;
 
     @SuppressWarnings("unused")
     private final Vision vision;
-    private final Blowers blowers;
     private final DrivetrainController drivetrainController;
     
     public final SendableChooser<String> autoChooser = new SendableChooser<>();

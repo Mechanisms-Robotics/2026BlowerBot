@@ -131,14 +131,19 @@ public class RobotContainer {
             .L1().onTrue(blowers.commandBlowerOn(0))
             .onFalse(blowers.commandBlowerOff(0));
         this.controller
-            .R1().onTrue(blowers.commandBlowerOn(1))
+            .L2().onTrue(blowers.commandBlowerOn(1))
             .onFalse(blowers.commandBlowerOff(1));
         this.controller
-            .L2().onTrue(blowers.commandBlowerOn(2))
+            .square().onTrue(blowers.commandBlowerOn(2))
             .onFalse(blowers.commandBlowerOff(2));
         this.controller
             .R2().onTrue(blowers.commandBlowerOn(3))
             .onFalse(blowers.commandBlowerOff(3));
+        this.controller
+            .R1().onTrue(blowers.commandBlowerOn(4))
+            .onFalse(blowers.commandBlowerOff(4));
+        
+        
         this.drivetrain.setDefaultCommand(
             new RunCommand(
                 () -> {

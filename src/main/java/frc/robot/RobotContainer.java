@@ -29,10 +29,15 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.blowers.Blowers;
+import frc.robot.subsystems.blowers.BlowersIO;
+import frc.robot.subsystems.blowers.BlowersIOSim;
+import frc.robot.subsystems.blowers.BlowersIOSparkMax;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.DrivetrainController;
 import frc.robot.subsystems.drivetrain.GyroIO;
 import frc.robot.subsystems.drivetrain.GyroIORedux;
+import frc.robot.subsystems.drivetrain.ModuleIO;
 import frc.robot.subsystems.drivetrain.ModuleIOSim;
 import frc.robot.subsystems.drivetrain.ModuleIOTalonFXRedux;
 import frc.robot.subsystems.vision.Vision;
@@ -41,6 +46,7 @@ import frc.robot.subsystems.vision.PoseCameraIOSim;
 
 public class RobotContainer {
     public final Drivetrain drivetrain;
+    public final Blowers blowers;
 
     @SuppressWarnings("unused")
     private final Vision vision;
@@ -71,6 +77,13 @@ public class RobotContainer {
                     Transform3d.kZero, 
                     drivetrain.poseEstimator
                 ));
+            blowers = new Blowers(
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER1_CAN_ID),
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER2_CAN_ID),
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER3_CAN_ID),
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER4_CAN_ID),
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER5_CAN_ID)
+            );
         } else {
             this.drivetrain = new Drivetrain(
                 new GyroIORedux(),
@@ -85,6 +98,13 @@ public class RobotContainer {
                 this.drivetrain.poseEstimator,
                 new PoseCameraIOPhoton(VisionConstants.CAMERA1_NAME, VisionConstants.CAMERA1_TRANSFORM3D),
                 new PoseCameraIOPhoton(VisionConstants.CAMERA2_NAME, VisionConstants.CAMERA2_TRANSFORM3D)
+            );
+            this.blowers = new Blowers(
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER1_CAN_ID),
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER2_CAN_ID),
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER3_CAN_ID),
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER4_CAN_ID),
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER5_CAN_ID)
             );
         }
 
@@ -103,6 +123,26 @@ public class RobotContainer {
                     this.drivetrain.resetHeading();
                 })
             );
+            
+        this.controller
+            .circle().onTrue(blowers.commandAllOn())
+            .onFalse(blowers.commandAllOff());
+        this.controller
+            .L1().onTrue(blowers.commandBlowerOn(0))
+            .onFalse(blowers.commandBlowerOff(0));
+        this.controller
+            .L2().onTrue(blowers.commandBlowerOn(1))
+            .onFalse(blowers.commandBlowerOff(1));
+        this.controller
+            .square().onTrue(blowers.commandBlowerOn(2))
+            .onFalse(blowers.commandBlowerOff(2));
+        this.controller
+            .R2().onTrue(blowers.commandBlowerOn(3))
+            .onFalse(blowers.commandBlowerOff(3));
+        this.controller
+            .R1().onTrue(blowers.commandBlowerOn(4))
+            .onFalse(blowers.commandBlowerOff(4));
+        
         
         this.drivetrain.setDefaultCommand(
             new RunCommand(
@@ -155,7 +195,6 @@ public class RobotContainer {
     private void publishAutoNames() {
         // add commands to the autos hashmap here
         autos.put("None", () -> Commands.none());
-        
 
         for (String name : autos.keySet()) {
             autoChooser.addOption(name, name);

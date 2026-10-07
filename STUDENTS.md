@@ -100,7 +100,24 @@ WPILib uses a standard layout. Memorize it!
 
 ---
 
-## 5. "Where Am I?": Odometry and Pose Estimation
+## 5. The Blowers (`subsystems/blowers/`)
+
+If the drivetrain felt like a lot, the **blowers** are the opposite: the simplest subsystem in the codebase, and a good first one to read end-to-end.
+
+Each blower is just a motor that's either **fully on** or **fully off** — no speed control, no PID, no sensor feedback we act on. `BlowersIO` is the contract (same pattern as `ModuleIO`): `blowerOn()`, `blowerOff()`, and `updateInputs()` for logging voltage/current. `BlowersIOSparkMax` drives a real SparkMax and reads its *actual* measured bus voltage (`blower.getBusVoltage()`), so the logged voltage reflects real battery sag instead of assuming a perfect 12V. `BlowersIOSim` fakes one in simulation the same way, using `RobotController.getBatteryVoltage()` so it stays consistent with whatever the simulated battery is doing — and it snaps straight to a made-up free speed instead of modeling spin-up time, since we don't care how long it takes to get there.
+
+`Blowers.java` owns all five motors (indices 0-4). Notice that `blowerOn(index)`, `blowerOff(index)`, `allOn()`, and `allOff()` are `private` — the only way anything outside the class can trigger them is through the **command** versions (`commandBlowerOn(index)`, `commandAllOn()`, ...), built with `runOnce(...)`. That's deliberate: it keeps "what a button press can actually do" limited to a short, intentional list of commands, instead of letting any code reach in and flip a motor directly. (This is the same public-vs-private idea from the IO pattern below, just one level up: `BlowersIO`'s methods *have* to be public because they're implementing an interface contract, but `Blowers`'s own helper methods don't implement anything, so we're free to lock them down.)
+
+In `RobotContainer.configureBindings()`, four buttons each run one blower while held (`onTrue` turns it on, `onFalse` turns it back off), and a single `○` (circle) button turns *every* blower on while held and off when released:
+
+```java
+controller.L1().onTrue(blowers.commandBlowerOn(0)).onFalse(blowers.commandBlowerOff(0));
+controller.circle().onTrue(blowers.commandAllOn()).onFalse(blowers.commandAllOff());
+```
+
+---
+
+## 6. "Where Am I?": Odometry and Pose Estimation
 
 The robot's **pose** is its position on the field (x, y) plus the direction it's facing. Knowing the pose is essential for autonomous routines and for field-relative driving.
 
@@ -121,7 +138,7 @@ AprilTags are the square black-and-white barcodes placed at known spots around t
 
 ---
 
-## 6. Autonomous (`commands/FollowPath.java`)
+## 7. Autonomous (`commands/FollowPath.java`)
 
 During the 20-second autonomous period, the robot drives itself. We plan paths in **Choreo**, a desktop app that creates smooth, time-optimized trajectories. The path files are saved into `src/main/deploy/` so they get copied to the robot.
 
@@ -137,7 +154,7 @@ Autos are registered by name in `RobotContainer.publishAutoNames()` and picked f
 
 ---
 
-## 7. Why Every Subsystem Has an "IO" Interface
+## 8. Why Every Subsystem Has an "IO" Interface
 
 This is the most important design pattern in the repo, and the one that confuses new members most. Take your time here.
 
@@ -182,7 +199,7 @@ Logger.processInputs("Drive/Module FL", inputs); // 2. log them
 
 ---
 
-## 8. Logging and Replay (AdvantageKit + AdvantageScope)
+## 9. Logging and Replay (AdvantageKit + AdvantageScope)
 
 We use **AdvantageKit** to record nearly everything the robot sees and does. Afterwards, we can open the log in **AdvantageScope** to view graphs, a 3D field, and even a 3D model of our robot (from `ascope_assets/`).
 
@@ -195,20 +212,6 @@ The robot runs in one of three **modes** (`CONSTANTS.Mode`):
 | `REAL` | On the robot | Real motors and sensors |
 | `SIM` | On your laptop | Physics simulation |
 | `REPLAY` | On your laptop, analyzing a log | Nothing; inputs come from the log file |
-
----
-
-## 9. Unit Tests: Robot Code That Checks Itself
-
-A **unit test** is a small program that runs one piece of our code and checks that the answer is right. For example: "if the joystick is pushed all the way diagonally, the robot should drive at full speed, not *faster* than full speed." The tests live in `src/test/java/`, in folders that mirror the real code in `src/main/java/`.
-
-Why bother? Robot code breaks in sneaky ways. Change one number or flip one sign, and the robot might drive backwards on the red alliance while working perfectly on blue. Tests catch that on your laptop in seconds, instead of on the field in front of a crowd.
-
-**The IO pattern makes this possible.** Remember the video game controller analogy from section 7? In tests we plug in a *fake* module (`FakeModuleIO`) that doesn't touch any motors. It just writes down what it was told to do. The test then checks those notes: "Did the front-left wheel get told to point at 135°?"
-
-**Tests run automatically on every pull request.** GitHub runs all of them (this is called **CI**, continuous integration), and a PR can't be merged into `develop` or `main` until they pass. If your PR shows a red ❌, click **Details** to see which test failed and why.
-
-**Good tests check things that could realistically go wrong:** math, unit conversions, red/blue alliance flipping, and whether a command starts and stops when it should. We don't write tests for trivial code just to have more tests.
 
 ---
 

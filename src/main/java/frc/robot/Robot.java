@@ -80,7 +80,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void disabledInit() {
     CommandScheduler.getInstance().schedule(
-      robotContainer.blowers.commandAllOff().ignoringDisable(true)
+      this.robotContainer.blowers.commandAllOff().ignoringDisable(true)
     );
   }
   

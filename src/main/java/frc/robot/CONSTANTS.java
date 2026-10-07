@@ -73,6 +73,20 @@ public class CONSTANTS {
         public static Pose2d CENTER = new Pose2d(LENGTH/2.0, WIDTH/2.0, Rotation2d.kZero);
     }
 
+    // MARK: Blowers
+    public static class BlowerConstants {
+        public static final int BLOWER1_CAN_ID = 10;
+        public static final int BLOWER2_CAN_ID = 11;
+        public static final int BLOWER3_CAN_ID = 12;
+        public static final int BLOWER4_CAN_ID = 13;
+        public static final int BLOWER5_CAN_ID = 14;
+    
+        // Max voltage and max current not currently used, but available for future use if needed
+        public static final double BLOWER_MAX_VOLTAGE = 12.0;
+        public static final double BLOWER_MAX_CURRENT = 40.0; // Amps
+        public static final double BLOWER_MAX_RPM = 5700.0; // RPM
+    }
+
     // MARK: Vision
     public static class VisionConstants {
         public static final String CAMERA1_NAME = "PhotonCameraLeft";

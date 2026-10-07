@@ -79,7 +79,9 @@ public class Robot extends LoggedRobot {
   
   @Override
   public void disabledInit() {
-    robotContainer.blowers.commandAllOff().schedule();
+    CommandScheduler.getInstance().schedule(
+      robotContainer.blowers.commandAllOff().ignoringDisable(true)
+    );
   }
   
   @Override

@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import frc.robot.CONSTANTS.DriveConstants;
 import frc.robot.CONSTANTS.VisionConstants;
+import frc.robot.commands.autos.TestAuto;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -48,8 +49,9 @@ public class RobotContainer {
     public final Drivetrain drivetrain;
     public final Blowers blowers;
 
-    @SuppressWarnings("unused")
-    private final Vision vision;
+    // Disabling vision for SCRIW 
+    // @SuppressWarnings("unused")
+    // private final Vision vision;
     private final DrivetrainController drivetrainController;
     
     public final SendableChooser<String> autoChooser = new SendableChooser<>();
@@ -70,14 +72,14 @@ public class RobotContainer {
                 new ModuleIOSim(DriveConstants.BACK_RIGHT)
             );
 
-            this.vision = new Vision(
-                this.drivetrain.poseEstimator,
-                new PoseCameraIOSim(
-                    "Photon_Camera_Sim1", 
-                    Transform3d.kZero, 
-                    drivetrain.poseEstimator
-                ));
-            blowers = new Blowers(
+            // this.vision = new Vision(
+            //     this.drivetrain.poseEstimator,
+            //     new PoseCameraIOSim(
+            //         "Photon_Camera_Sim1", 
+            //         Transform3d.kZero, 
+            //         drivetrain.poseEstimator
+            //     ));
+            this.blowers = new Blowers(
                 new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER1_CAN_ID),
                 new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER2_CAN_ID),
                 new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER3_CAN_ID),
@@ -94,11 +96,12 @@ public class RobotContainer {
         
             );
            
-            this.vision = new Vision(
-                this.drivetrain.poseEstimator,
-                new PoseCameraIOPhoton(VisionConstants.CAMERA1_NAME, VisionConstants.CAMERA1_TRANSFORM3D),
-                new PoseCameraIOPhoton(VisionConstants.CAMERA2_NAME, VisionConstants.CAMERA2_TRANSFORM3D)
-            );
+            // this.vision = new Vision(
+            //     this.drivetrain.poseEstimator,
+            //     new PoseCameraIOPhoton(VisionConstants.CAMERA1_NAME, VisionConstants.CAMERA1_TRANSFORM3D),
+            //     new PoseCameraIOPhoton(VisionConstants.CAMERA2_NAME, VisionConstants.CAMERA2_TRANSFORM3D)
+            // );
+
             this.blowers = new Blowers(
                 new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER1_CAN_ID),
                 new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER2_CAN_ID),
@@ -195,6 +198,8 @@ public class RobotContainer {
     private void publishAutoNames() {
         // add commands to the autos hashmap here
         autos.put("None", () -> Commands.none());
+        autos.put("Test Auto", () -> new TestAuto(drivetrain));
+        
 
         for (String name : autos.keySet()) {
             autoChooser.addOption(name, name);

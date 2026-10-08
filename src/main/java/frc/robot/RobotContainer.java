@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import frc.robot.CONSTANTS.DriveConstants;
 import frc.robot.CONSTANTS.VisionConstants;
+import frc.robot.commands.autos.TestAuto;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -29,10 +30,15 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.blowers.Blowers;
+import frc.robot.subsystems.blowers.BlowersIO;
+import frc.robot.subsystems.blowers.BlowersIOSim;
+import frc.robot.subsystems.blowers.BlowersIOSparkMax;
 import frc.robot.subsystems.drivetrain.Drivetrain;
 import frc.robot.subsystems.drivetrain.DrivetrainController;
 import frc.robot.subsystems.drivetrain.GyroIO;
 import frc.robot.subsystems.drivetrain.GyroIORedux;
+import frc.robot.subsystems.drivetrain.ModuleIO;
 import frc.robot.subsystems.drivetrain.ModuleIOSim;
 import frc.robot.subsystems.drivetrain.ModuleIOTalonFXRedux;
 import frc.robot.subsystems.vision.Vision;
@@ -41,9 +47,11 @@ import frc.robot.subsystems.vision.PoseCameraIOSim;
 
 public class RobotContainer {
     public final Drivetrain drivetrain;
+    public final Blowers blowers;
 
-    @SuppressWarnings("unused")
-    private final Vision vision;
+    // Disabling vision for SCRIW 
+    // @SuppressWarnings("unused")
+    // private final Vision vision;
     private final DrivetrainController drivetrainController;
     
     public final SendableChooser<String> autoChooser = new SendableChooser<>();
@@ -64,13 +72,20 @@ public class RobotContainer {
                 new ModuleIOSim(DriveConstants.BACK_RIGHT)
             );
 
-            this.vision = new Vision(
-                this.drivetrain.poseEstimator,
-                new PoseCameraIOSim(
-                    "Photon_Camera_Sim1", 
-                    Transform3d.kZero, 
-                    drivetrain.poseEstimator
-                ));
+            // this.vision = new Vision(
+            //     this.drivetrain.poseEstimator,
+            //     new PoseCameraIOSim(
+            //         "Photon_Camera_Sim1", 
+            //         Transform3d.kZero, 
+            //         drivetrain.poseEstimator
+            //     ));
+            this.blowers = new Blowers(
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER1_CAN_ID),
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER2_CAN_ID),
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER3_CAN_ID),
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER4_CAN_ID),
+                new BlowersIOSim(CONSTANTS.BlowerConstants.BLOWER5_CAN_ID)
+            );
         } else {
             this.drivetrain = new Drivetrain(
                 new GyroIORedux(),
@@ -81,16 +96,25 @@ public class RobotContainer {
         
             );
            
-            this.vision = new Vision(
-                this.drivetrain.poseEstimator,
-                new PoseCameraIOPhoton(VisionConstants.CAMERA1_NAME, VisionConstants.CAMERA1_TRANSFORM3D),
-                new PoseCameraIOPhoton(VisionConstants.CAMERA2_NAME, VisionConstants.CAMERA2_TRANSFORM3D)
+            // this.vision = new Vision(
+            //     this.drivetrain.poseEstimator,
+            //     new PoseCameraIOPhoton(VisionConstants.CAMERA1_NAME, VisionConstants.CAMERA1_TRANSFORM3D),
+            //     new PoseCameraIOPhoton(VisionConstants.CAMERA2_NAME, VisionConstants.CAMERA2_TRANSFORM3D)
+            // );
+
+            this.blowers = new Blowers(
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER1_CAN_ID),
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER2_CAN_ID),
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER3_CAN_ID),
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER4_CAN_ID),
+                new BlowersIOSparkMax(CONSTANTS.BlowerConstants.BLOWER5_CAN_ID)
             );
         }
 
         this.drivetrainController = new DrivetrainController(this.drivetrain);
 
         configureBindings();
+        publishAutoNames();
         SmartDashboard.putData("CommandScheduler", CommandScheduler.getInstance());
     }
 
@@ -102,6 +126,26 @@ public class RobotContainer {
                     this.drivetrain.resetHeading();
                 })
             );
+            
+        this.controller
+            .circle().onTrue(blowers.commandAllOn())
+            .onFalse(blowers.commandAllOff());
+        this.controller
+            .L1().onTrue(blowers.commandBlowerOn(0))
+            .onFalse(blowers.commandBlowerOff(0));
+        this.controller
+            .L2().onTrue(blowers.commandBlowerOn(1))
+            .onFalse(blowers.commandBlowerOff(1));
+        this.controller
+            .square().onTrue(blowers.commandBlowerOn(2))
+            .onFalse(blowers.commandBlowerOff(2));
+        this.controller
+            .R2().onTrue(blowers.commandBlowerOn(3))
+            .onFalse(blowers.commandBlowerOff(3));
+        this.controller
+            .R1().onTrue(blowers.commandBlowerOn(4))
+            .onFalse(blowers.commandBlowerOff(4));
+        
         
         this.drivetrain.setDefaultCommand(
             new RunCommand(
@@ -154,6 +198,7 @@ public class RobotContainer {
     private void publishAutoNames() {
         // add commands to the autos hashmap here
         autos.put("None", () -> Commands.none());
+        autos.put("Test Auto", () -> new TestAuto(drivetrain));
         
 
         for (String name : autos.keySet()) {
@@ -172,9 +217,11 @@ public class RobotContainer {
         return autoCommand;
     }
 
-    private static Translation2d getDriveVelocity(double x, double y) {
+    // Package-private so it can be unit tested
+    static Translation2d getDriveVelocity(double x, double y) {
+        // Clamp to 1 so a full diagonal stick isn't faster than full forward
         double linearMag = MathUtil.applyDeadband(
-            Math.hypot(x, y),
+            Math.min(Math.hypot(x, y), 1.0),
             DriveConstants.DEADBAND
         );
         Rotation2d direction = new Rotation2d(Math.atan2(y, x));

@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import frc.robot.CONSTANTS.DriveConstants;
 import frc.robot.CONSTANTS.VisionConstants;
 import frc.robot.commands.autos.TestAuto;
+import frc.robot.commands.autos.TrenchToOutpostAuto;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -199,6 +200,7 @@ public class RobotContainer {
         // add commands to the autos hashmap here
         autos.put("None", () -> Commands.none());
         autos.put("Test Auto", () -> new TestAuto(drivetrain));
+        autos.put("Trench to Outpost Auto", () -> new TrenchToOutpostAuto(drivetrain));
         
 
         for (String name : autos.keySet()) {
